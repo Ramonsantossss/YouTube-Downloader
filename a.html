@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Metadados do documento -->
+  <meta charset="UTF-8"> <!-- Define o conjunto de caracteres UTF-8 para a página -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Define a escala inicial para dispositivos móveis -->
+  <title>Download de vídeo do YouTube</title> <!-- Título da página -->
+</head>
+
+<style>
+  /* Estilos CSS para a página */
+
+/* Estilos para o corpo da página */
+body {
+  font-family: Arial, sans-serif; /* Define a fonte para o texto */
+  margin: 0; /* Remove as margens padrão do corpo */
+  padding: 0; /* Remove o preenchimento padrão do corpo */
+}
+
+/* Estilos para o container principal */
+.container {
+  max-width: 90%; /* Define a largura máxima do container */
+  margin: 50px auto; /* Centraliza o container horizontalmente na página com uma margem superior de 50px */
+  padding: 20px; /* Define um preenchimento interno de 20px para o container */
+  border: 1px solid #ccc; /* Adiciona uma borda de 1px com cor cinza (#ccc) ao container */
+  border-radius: 5px; /* Adiciona bordas arredondadas de 5px ao container */
+}
+
+/* Estilos para o título principal da página */
+h1 {
+  text-align: center; /* Centraliza o texto do título */
+}
+
+/* Estilos para o formulário */
+form {
+  text-align: center; /* Centraliza os elementos do formulário */
+}
+
+/* Estilos para os rótulos (labels) */
+label {
+  display: block; /* Faz com que os rótulos sejam exibidos em blocos, um abaixo do outro */
+  margin-bottom: 10px; /* Adiciona uma margem inferior de 10px entre os rótulos */
+}
+
+/* Estilos para os campos de entrada de texto */
+input {
+  width: 90%; /* Define a largura dos campos de entrada de texto como 90% do contêiner */
+  padding: 10px; /* Adiciona um preenchimento interno de 10px nos campos de entrada */
+  margin-bottom: 20px; /* Adiciona uma margem inferior de 20px entre os campos de entrada */
+}
+
+/* Estilos para o botão de download */
+button {
+  padding: 10px 20px; /* Define um preenchimento interno de 10px vertical e 20px horizontal no botão */
+  background-color: #007bff; /* Define a cor de fundo do botão como azul (#007bff) */
+  color: #fff; /* Define a cor do texto do botão como branco */
+  border: none; /* Remove a borda do botão */
+  border-radius: 5px; /* Adiciona bordas arredondadas de 5px ao botão */
+  cursor: pointer; /* Muda o cursor do mouse para uma mão quando o usuário passa o mouse sobre o botão */
+}
+
+/* Estilos para a div que exibe o resultado do download */
+#downloadResult {
+  margin-top: 20px; /* Adiciona uma margem superior de 20px para separar o resultado do restante do conteúdo */
+  text-align: center; /* Centraliza o texto na div */
+}
+
+/* Estilos para o elemento de vídeo */
+video {
+  display: block; /* Define o elemento de vídeo como um bloco, para que ele ocupe a largura máxima do contêiner */
+  max-width: 100%; /* Define a largura máxima do vídeo como 100% do contêiner */
+  margin: 0 auto; /* Centraliza o vídeo horizontalmente no contêiner */
+}
+
+</style>
+
+<body>
+
+  <div class="container">
+    <!-- Container principal -->
+    <h1>Download de vídeo do YouTube</h1>
+    <!-- Título principal da página -->
+    <form id="downloadForm">
+      <!-- Formulário com um campo para inserir o link do vídeo -->
+      <label for="videoUrl">Insira o link do vídeo do YouTube:</label>
+      <!-- Rótulo (label) para o campo de entrada -->
+      <input type="text" id="videoUrl" name="videoUrl" required>
+      <!-- Campo de entrada de texto para o link do vídeo (obrigatório) -->
+      <button type="submit">Baixar Vídeo</button>
+      <!-- Botão de envio do formulário -->
+    </form>
+    <div id="downloadResult"></div>
+    <!-- Div onde será exibido o resultado do download, como o vídeo ou uma mensagem de erro -->
+  </div>
+
+<script>
+  // Script JavaScript começa aqui
+
+  document.getElementById('downloadForm').addEventListener('submit', function (e) {
+    // Adiciona um "listener" para o evento "submit" do formulário
+    e.preventDefault();
+    // Previne o comportamento padrão do envio do formulário (recarregar a página)
+    const videoUrl = document.getElementById('videoUrl').value;
+    // Obtém o valor inserido no campo de entrada (link do vídeo)
+    const apiUrl = `https://anikit-9yjf.onrender.com/anikit/ytmp4?videoUrl=${videoUrl}`;
+    // Constrói a URL da API que será chamada para obter o link para download do vídeo
+
+    fetch(apiUrl)
+      // Faz uma requisição à API utilizando o link do vídeo como parâmetro
+      .then(response => response.json())
+      // Converte a resposta da API para JSON
+      .then(data => {
+        // Callback para lidar com os dados retornados da API
+        if (data.url) {
+          // Verifica se a API retornou o link do vídeo.
+          displayVideo(data.url);
+          // Se sim, chama a função para exibir o vídeo na página
+        } else {
+          displayErrorMessage('Não foi possível obter o link do vídeo.');
+          // Caso não tenha retornado um link de vídeo válido, exibe uma mensagem de erro
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao processar a solicitação:', error);
+        displayErrorMessage('Ocorreu um erro ao processar a solicitação.');
+        // Tratamento de erro caso ocorra algum problema na requisição da API
+      });
+  });
+
+  function displayVideo(videoLink) {
+    // Função para exibir o vídeo na página
+    document.getElementById('downloadResult').innerHTML = '';
+    // Limpa o conteúdo anterior da div #downloadResult (caso haja algum)
+    const videoElement = document.createElement('video');
+    // Cria um elemento <video> para exibir o vídeo
+    videoElement.controls = true;
+    // Habilita os controles do vídeo (play, pause, etc.)
+    videoElement.src = videoLink;
+    // Define o link do vídeo como a fonte do elemento <video>
+    videoElement.width = '100%';
+    // Define a largura do vídeo como 100% da largura da div #downloadResult
+    videoElement.height = 'auto';
+    // Define a altura do vídeo como automática, para manter a proporção original
+
+    document.getElementById('downloadResult').appendChild(videoElement);
+    // Adiciona o elemento <video> à div #downloadResult para exibi-lo na página
+  }
+
+  function displayErrorMessage(message) {
+    // Função para exibir uma mensagem de erro na div #downloadResult
+    document.getElementById('downloadResult').innerHTML = `<p class="error">${message}</p>`;
+    // Cria um parágrafo com a classe "error" contendo a mensagem de erro e o adiciona à div #downloadResult
+  }
+
+</script>
+</body>
+
+</html>
